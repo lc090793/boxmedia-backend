@@ -1,7 +1,7 @@
 import { prisma } from "../prisma/client.js";
-import bcrypt  from "bcryptjs";
+import bcrypt from "bcryptjs";
 
-export default {
+class UserController {
   async createUser(req, res) {
     try {
       const { name, email, password } = req.body;
@@ -11,13 +11,13 @@ export default {
         return res.json({ error: "user exists on db" });
       }
 
-      const pass = await bcrypt.hash(password,8);
+      const pass = await bcrypt.hash(password, 8);
 
       user = await prisma.user.create({
         data: {
           name,
           email,
-          password:pass
+          password: pass
         }
       });
 
@@ -25,7 +25,7 @@ export default {
     } catch (error) {
       return res.json({ error });
     }
-  },
+  }
 
   async findAllUser(req, res) {
     try {
@@ -34,17 +34,29 @@ export default {
     } catch (error) {
       return res.json({ error });
     }
-  },
+  }
 
   async findUniqueUser(req, res) {
     try {
       const { id } = req.params;
-      const user = await prisma.user.findUnique({ where: { id: Number(id) } });
+      const user = await prisma.user.findUnique({
+        where: { id: Number(id) },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          myTrails: true,
+          resume: true,
+          photoURL: true,
+          uid: true
+        }
+      });
       return res.json(user);
     } catch (error) {
       return res.json({ error });
     }
-  },
+  }
+
   async update(req, res) {
     try {
       const { id } = req.params;
@@ -65,7 +77,7 @@ export default {
     } catch (error) {
       return res.json({ error });
     }
-  },
+  }
 
   async delete(req, res) {
     try {
@@ -84,4 +96,6 @@ export default {
       return res.json({ error });
     }
   }
-};
+}
+
+export { UserController };

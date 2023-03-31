@@ -2,7 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["extendedWhereUnique"]
 }
 
 datasource db {
@@ -11,19 +12,104 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  name       String
-  password   String
-  created_at DateTime @default(now())
-  Post       Post[]
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String
+  password      String
+  created_at    DateTime       @default(now())
+  resume        String?
+  photoURL      String?
+  uid           String?
+  type          String?
+  Post          Post[]
+  refresh_token RefreshToken[]
+  Trail         Trail[]
+  myTrails      MyTrails[]
+
+  @@map("users")
+}
+
+model MyTrails {
+  id      Int  @id @default(autoincrement())
+  trailId Int
+  user    User @relation(fields: [userId], references: [id])
+  userId  Int
+
+  @@map("myTrails")
 }
 
 model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(true)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+  id         Int      @id @default(autoincrement())
+  title      String
+  content    String?
+  category   String?
+  timeToRead String?
+  created_at DateTime @default(now())
+  coverURL   String?
+  published  Boolean  @default(true)
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   Int
+
+  @@map("posts")
+}
+
+model RefreshToken {
+  id        Int  @id @default(autoincrement())
+  expiresIn Int
+  user      User @relation(fields: [userId], references: [id])
+  userId    Int
+
+  @@map("refresh_token")
+}
+
+model Trail {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  published   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  course      Course[]
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  duration    String?
+
+  @@map("trail")
+}
+
+model Course {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  created_at  DateTime @default(now())
+  published   Boolean  @default(true)
+  Trail       Trail    @relation(fields: [trailId], references: [id])
+  trailId     Int
+  Topic       Topic[]
+
+  @@map("course")
+}
+
+model Topic {
+  id         Int      @id @default(autoincrement())
+  title      String
+  created_at DateTime @default(now())
+  published  Boolean  @default(true)
+  Course     Course   @relation(fields: [courseId], references: [id])
+  courseId   Int
+  Lesson     Lesson[]
+
+  @@map("content")
+}
+
+model Lesson {
+  id          Int      @id @default(autoincrement())
+  title       String
+  video       String
+  description String
+  created_at  DateTime @default(now())
+  published   Boolean  @default(true)
+  Topic       Topic    @relation(fields: [topicId], references: [id])
+  topicId     Int
+
+  @@map("lesson")
 }

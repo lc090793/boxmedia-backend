@@ -1,0 +1,7 @@
+-- CreateTable
+CREATE TABLE "myTrails" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "trailId" INTEGER NOT NULL,
+    "userId" INTEGER NOT NULL,
+    CONSTRAINT "myTrails_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
